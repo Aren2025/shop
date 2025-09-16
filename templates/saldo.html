@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Saldo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header>
+    <div class="header-container">
+        <h1 class="logo">Mi Tienda</h1>
+        <div class="header-right">
+            <!-- Botón Volver al inicio siempre visible -->
+            <a href="{{ url_for('index') }}" class="btn">← Inicio</a>
+
+            {% if session.get('username') %}
+            <span class="user">{{ session['username'] }}</span>
+            <span class="saldo">{{ saldo }} {{ moneda }}</span>
+            <a href="{{ url_for('logout') }}" class="btn">Cerrar sesión</a>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="btn">Iniciar sesión</a>
+            <a href="{{ url_for('register') }}" class="btn">Registrarse</a>
+            {% endif %}
+        </div>
+    </div>
+</header>
+
+<div class="container">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flash-container">
+        {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+        </div>
+    {% endif %}
+    {% endwith %}
+
+    <h2>Recargar Saldo</h2>
+
+    <div class="productos-grid">
+        {% for nombre, paquete in paquetes.items() %}
+        <div class="card">
+            <h3>{{ nombre }}</h3>
+            <p>{{ paquete.coins }} coins</p>
+            <p>Precio: {{ paquete.precio_local }} {{ moneda }}</p>
+            <form action="{{ url_for('recargar_tarjeta') }}" method="POST">
+                <input type="hidden" name="paquete" value="{{ nombre }}">
+                <input type="hidden" name="moneda" value="{{ moneda }}">
+                <button type="submit">Recargar</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+</body>
+</html>
